@@ -16,6 +16,7 @@ static bool compile_shader(uint32_t shader_id, const char * shader_src){
     if(!ok){
         glGetShaderInfoLog(shader_id, 512, NULL, info_log);
         std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << info_log << "\n";
+        return false;
     }
 
     return ok;

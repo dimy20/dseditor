@@ -1,12 +1,12 @@
 EXEC = main
-CC = g++
+CC = clang++
 
 SRC_DIR = src
 BUILD_DIR = build
 INCLUDE_DIR = include
 
-LDFLAGS = -ldl -lglfw
-CFLAGS = -Wall -Werror -std=c++2a -g -I$(INCLUDE_DIR)
+LDFLAGS = -ldl -lglfw -lGL -lassimp
+CFLAGS = -Wall -Werror -std=c++20 -g -I$(INCLUDE_DIR)
 
 SRCS = $(shell find $(SRC_DIR) -name '*.cpp')
 OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS))

@@ -3,3 +3,7 @@ build
 assets
 include/glad
 include/glm-*
+src/glad
+.cache/
+compile_commands.json
+teapot.obj

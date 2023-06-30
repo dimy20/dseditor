@@ -4,7 +4,9 @@
 #include <optional>
 
 struct Texture{
-  uint32_t id;
+    uint32_t id;
+    std::string type;
+    std::string path;
 };
 
-std::optional<Texture> load_texture(const std::string& filename);
+bool load_texture_make_id(const char *filename, uint32_t *id);
