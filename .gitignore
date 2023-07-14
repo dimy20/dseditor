@@ -4,7 +4,7 @@ assets
 include/glad
 include/glm-*
 include/KHR
-src/glad
+src/glad.cpp
 .cache/
 compile_commands.json
 teapot.obj
