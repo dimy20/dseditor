@@ -3,7 +3,9 @@ build
 assets
 include/glad
 include/glm-*
+include/KHR
 src/glad
 .cache/
 compile_commands.json
 teapot.obj
+NOTES

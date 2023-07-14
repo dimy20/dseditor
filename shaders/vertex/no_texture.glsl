@@ -5,10 +5,6 @@ layout (location = 2) in vec2 in_texture_coord;
 
 uniform mat4 MVP;
 
-out vec3 vertex_color;
-out vec2 texture_coord;
-
 void main(){
     gl_Position = MVP * vec4(aPos, 1.0);
-    texture_coord = in_texture_coord;
 }

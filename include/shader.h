@@ -6,27 +6,20 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <optional>
+enum shader_id{
+    BASIC,
+    NO_TEXTURE,
 
-struct Shader{
-	void use() const { glUseProgram(id); }
-	inline void set_int(const std::string& name, int value) const{
-		glUniform1i(glGetUniformLocation(id, name.c_str()), value);
-	}
-	inline void set_float(const std::string& name, float value) const{
-		glUniform1f(glGetUniformLocation(id, name.c_str()), value);
-	}
-	inline void set_bool(const std::string& name, bool value) const{
-		glUniform1i(glGetUniformLocation(id, name.c_str()), value);
-	}
-
-	inline void set_mat4(const std::string& name, const glm::mat4& m){
-		uint32_t loc = glGetUniformLocation(id, name.c_str());
-		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(m));
-	}
-
-  uint32_t id;
+    SHADERS_NUM
 };
 
-std::optional<Shader> load_shader(const std::string& vshader_path,
-                                  const std::string& fshader_path);
+struct Shader{
+    void use();
+    void set_mat4(const char *name, const glm::mat4& m);
+    void set_int(const char *name, int value);
+    void set_bool(const char *name, bool value);
+    void set_float(const char *name, float value);
+    uint32_t program_id;
+};
+
+bool load_shader(Shader * shader, const char *vertex_shader_path, const char *frag_shader_path);

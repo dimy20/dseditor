@@ -1,11 +1,13 @@
 #include <assimp/material.h>
 #include <assimp/mesh.h>
 #include <iostream>
-#include "mesh.h"
+#include "model.h"
 #include "glad/glad.h"
+#include "transform.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "RenderContext.h"
 
 
 //TODO: Optimize to avoid loading the same texture multiple times.
@@ -56,7 +58,7 @@ void init_mesh(Mesh *mesh,
     mesh->textures = std::move(textures);
 }
 
-static void mesh_draw(Mesh *mesh, const Shader& shader){
+static void mesh_draw(Mesh *mesh, Shader * shader){
     assert(mesh != NULL);
     uint32_t diffuse_n = 1;
     uint32_t specular_n = 1;
@@ -72,10 +74,12 @@ static void mesh_draw(Mesh *mesh, const Shader& shader){
         }
 
         auto sampler_id = "material." + type + number;
-        shader.set_int(sampler_id, i);
+        shader->set_int(sampler_id.c_str(), i);
         glBindTexture(GL_TEXTURE_2D, mesh->textures[i].id);
     };
+
     glActiveTexture(GL_TEXTURE0);
+
 
     glBindVertexArray(mesh->vao);
     //glDrawArrays(GL_TRIANGLES, 0, mesh->vertices.size());
@@ -88,10 +92,13 @@ static void mesh_draw(Mesh *mesh, const Shader& shader){
     }
 };
 
-void model_draw(Model *model, const Shader& shader){
-    assert(model != NULL);
-    for(size_t i = 0; i < model->meshes.size(); i++){
-        mesh_draw(&model->meshes[i], shader);
+void Model::draw(const glm::mat4& view){
+    RobyRender::shaders[shader_id].use();
+
+    RobyRender::shaders[shader_id].set_mat4("MVP", RobyRender::projection * view * transform.world());
+
+    for(size_t i = 0; i < meshes.size(); i++){
+        mesh_draw(&meshes[i], &RobyRender::shaders[shader_id]);
     }
 };
 
@@ -109,6 +116,7 @@ bool load_model(Model* model, const char* filename){
     while(end >= 0 && filename[end] != '/') end--;
 
     model->directory = end < 0 ? "." : std::string(filename, filename + end);
+    model->shader_id = shader_id::NO_TEXTURE;
     process_node(model, scene->mRootNode, scene, model->meshes);
 
     return true;
@@ -172,7 +180,7 @@ static Mesh process_mesh(Model *model, aiMesh *mesh, const aiScene *scene){
     if(mesh->mMaterialIndex >= 0){
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
         auto diffuse_maps = load_material_textures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-        auto specular_maps = load_material_textures(material, aiTextureType_DIFFUSE, "texture_specular");
+        auto specular_maps = load_material_textures(material, aiTextureType_SPECULAR, "texture_specular");
         model_textures.insert(model_textures.end(), diffuse_maps.begin(), diffuse_maps.end());
         model_textures.insert(model_textures.end(), specular_maps.begin(), specular_maps.end());
     }
@@ -205,3 +213,6 @@ static std::vector<Texture> load_material_textures(aiMaterial *material,
     }
     return textures;
 }
+
+Vertex::Vertex(const glm::vec3& _position, const glm::vec3& _normal, const glm::vec2& _uv_coords)
+    : position(_position), normal(_normal), uv_coords(_uv_coords) {}
